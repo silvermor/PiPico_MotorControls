@@ -1,0 +1,388 @@
+2025 08 26 Log
+
+Horizontal Motor Stage
+
+Homing to MIN limit...
+Moved a total of 17 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.68 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84053 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -27 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.84 mm
+Returning home...
+Homing to MIN limit...
+Limit reached! Stopping.
+Moved a total of 84300 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -25 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.86 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84327 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -27 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.83 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84296 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -27 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.84 mm
+Returning home...
+Homing to MIN limit...
+Limit reached! Stopping.
+Moved a total of 84300 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 20 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.87 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84309 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 31 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.90 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84340 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -1 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.69 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84091 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 9 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.73 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84125 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 29 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.75 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84150 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 63 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.85 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84288 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 44 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 66.20 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84740 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 30 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.70 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84063 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 32 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 66.21 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84741 steps to Home position
+Home set: M=0.00 mm
+
+Limit debounce 20ms
+
+Homing to MIN limit...
+Moved a total of 681 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.67 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84060 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 2 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.66 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84043 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 2 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.66 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84048 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 3 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.67 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 84052 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 1 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 65.67 mm
+Returning home...
+Homing to MIN limit...
+Limit reached! Stopping.
+Moved a total of 84055 steps to Home position
+Home set: M=0.00 mm
+
+Vertical Motor Stage, stepped at 3ns/0.3ns
+
+Homing to MIN limit...
+Limit reached! Stopping.
+Moved a total of 1330 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 41.36 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 52942 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 771 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 41.95 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 52957 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 353 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 41.65 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 52944 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 290 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 41.60 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 52955 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 335 steps to Home position
+Home set: M=0.00 mm
+Traversing to MAX limit...
+Calibration complete: M_max = 41.64 mm
+Returning home...
+Homing to MIN limit...
+Moved a total of 52963 steps to Home position
+Home set: M=0.00 mm
+
+>>> mul fwd
+Moved until limit: 52932 net steps (41.35 mm), M=41.35
+Moved until limit: 37 net steps (0.03 mm), M=41.38
+Moved until limit: 26 net steps (0.02 mm), M=41.40
+Moved until limit: -32 net steps (-0.02 mm), M=41.38
+
+>>> mul fwd slow
+Moved until limit: 5 net steps (0.00 mm), M=41.38
+Moved until limit: 2 net steps (0.00 mm), M=41.38
+Moved until limit: 1 net steps (0.00 mm), M=41.38
+Moved until limit: 2 net steps (0.00 mm), M=41.39
+Moved until limit: -1 net steps (-0.00 mm), M=41.39
+Moved until limit: 5 net steps (0.00 mm), M=41.39
+
+>>> mul rev slow
+Moved until limit: 53014 net steps (41.42 mm), M=-0.03
+Moved until limit: -10 net steps (-0.01 mm), M=-0.45
+Moved until limit: -2 net steps (-0.00 mm), M=-0.44
+Moved until limit: 9 net steps (0.01 mm), M=-0.45
+Moved until limit: 5 net steps (0.00 mm), M=-0.45
+Moved until limit: 0 net steps (0.00 mm), M=-0.45
+Moved until limit: 1 net steps (0.00 mm), M=-0.45
+Moved until limit: 0 net steps (0.00 mm), M=-0.45
+Moved until limit: 0 net steps (0.00 mm), M=-0.45
+Moved until limit: -1 net steps (-0.00 mm), M=-0.45
+Moved until limit: -4 net steps (-0.00 mm), M=-0.45
+Moved until limit: -2 net steps (-0.00 mm), M=-0.45
+Moved until limit: 0 net steps (0.00 mm), M=-0.45
+Moved until limit: 0 net steps (0.00 mm), M=-0.45
+Moved until limit: -1 net steps (-0.00 mm), M=-0.45
+Moved until limit: 2 net steps (0.00 mm), M=-0.45
+Moved until limit: -2 net steps (-0.00 mm), M=-0.45
+Moved until limit: -3 net steps (-0.00 mm), M=-0.45
+Moved until limit: -1 net steps (-0.00 mm), M=-0.45
+Moved until limit: -1 net steps (-0.00 mm), M=-0.44
+Moved until limit: 1 net steps (0.00 mm), M=-0.45
+
+>>> home
+Homing to MIN limit...
+Moved a total of -26 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 12 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of -2 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 0 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 0 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 0 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 0 steps to Home position
+Home set: M=0.00 mm
+
+Homing to MIN limit...
+Moved a total of 0 steps to Home position
+Home set: M=0.00 mm
+
+Moved until limit: 53503 net steps (41.80 mm), M=41.80
+
+
+*******************************************
+Made move_until_limit have double movement.
+*******************************************
+
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 118 net steps (0.09 mm), M=0.09
+>> 
+>>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: -35 net steps (-0.03 mm), M=0.06
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 1 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: -1 net steps (-0.00 mm), M=0.06
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 1 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 1 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 0 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 0 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 0 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: -1 net steps (-0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 0 net steps (0.00 mm), M=0.07
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: -1 net steps (-0.00 mm), M=0.06
+>> 
+>>> mul fwd slow
+mul fwd slow
+Moved until limit: 0 net steps (0.00 mm), M=0.06
+
+home
+Homing to MIN limit...
+Moved a total of 53056 steps to Home position
+Home set: M=0.00 mm
+
+
