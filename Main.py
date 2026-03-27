@@ -25,8 +25,8 @@ SUBDIVISION = 8   # microstepping setting
 STEP_ANGLE = 1.8 / SUBDIVISION  # degrees per step
 MM_PER_STEP = MM_PER_REV_Y / (STEP_ANGLE/360)  # mm per microstep
 STEPS_PER_REV = int(360 / STEP_ANGLE)  # steps per revolution
-Y_HOME = 3.3        # mm, measured at M=0
-L = 101.9215384  #101.3580865     # mm, length of scissor arms
+Y_HOME = 3.2        # mm, measured at M=0 using a feeler gauge
+L = math.sqrt(10388)   #101.9215384     # mm, length of scissor arms
 
 
 # Position tracking
@@ -272,32 +272,62 @@ def move_steps_x(num_steps=1, speed_fast=False, forward=True):
 
 
 def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
-    global current_M_yaxis
-    if M_max_y is not None:
-        if forward:
-            dist_mm = min(dist_mm, z_from_m(M_max_y) - z_from_m(current_M_yaxis))
-        else:
-            dist_mm = min(dist_mm, z_from_m(current_M_yaxis))
-    if dist_mm <= 0:
-        print("No move: at limit.")
-        return
-    distance_in_x = 0
+    global current_M_yaxis, current_Z
+    
+    # Detetmine current Z from current M
+    current_Z = z_from_m(current_M_yaxis)
+    # Compute target Z
     if forward:
-        distance_in_x = m_from_z(z_from_m(current_M_yaxis) + dist_mm) - current_M_yaxis
+        target_Z = current_Z + dist_mm
     else:
-        distance_in_x = current_M_yaxis - m_from_z(z_from_m(current_M_yaxis) - dist_mm)
-    steps = round((distance_in_x / MM_PER_REV_Y) * STEPS_PER_REV)
-    direction = 0 if forward else 1
+        target_Z = current_Z - dist_mm
+    # Clamp physical limits
+    Z_min = z_from_m(0)
+    Z_max = z_from_m(M_max_y)
+
+    if target_Z < Z_min:
+        target_Z = Z_min
+    if target_Z > Z_max:
+        target_Z = Z_max
+    
+    # Convert target Z -> target M
+    target_M = m_from_z(target_Z)
+
+    # Compute delta M (screw travel)
+    delta_M = target_M - current_M_yaxis
+
+    # If delta_M is tiny, do nothing
+    if abs(delta_M) < 0.00078125:  # corresponds to 1 microstep
+        print("No move: at limit or zero displacement.")
+        return
+    
+    # Convert delta M to steps
+    steps = round((abs(delta_M) / MM_PER_REV_Y) * STEPS_PER_REV)
+    direction = 0 if delta_M > 0 else 1
+
+    # Execute the motion
     enable_motor()
+    moved_steps = 0
     for p in range(steps):
         if not safe_step_y(direction, speed_fast):
+            moved_steps = p
+            print(f"Expected to move {steps} steps, but only moved {moved_steps}.")
             break
-    
-    time.sleep(0.005)  # brief pause
-    #disable_motor()
-    time.sleep(0.005)  # brief pause
-    current_M_yaxis += distance_in_x if forward else -distance_in_x
-    print(f"Moved in y {'FWD' if forward else 'REV'} {dist_mm:.2f} mm, Z={z_from_m(current_M_yaxis):.2f}")
+        moved_steps = p + 1
+    time.sleep(0.01)  # brief pause
+
+    # Update M and Z based on actual steps moved
+    actual_delta_M = (moved_steps / STEPS_PER_REV) * MM_PER_REV_Y
+    if delta_M < 0:
+        actual_delta_M = -actual_delta_M
+
+    current_M_yaxis += actual_delta_M
+    current_Z = z_from_m(current_M_yaxis)
+
+    # Report
+    print(f"Requested ΔZ = {dist_mm:.3f} mm {'FWD' if forward else 'REV'}")
+    print(f"Moved ΔM = {actual_delta_M:.4f} mm → New Z = {current_Z:.3f} mm")
+    print(f"Steps moved: {moved_steps}")
 
 def move_distance_mm_x(dist_mm, speed_fast=True, forward=True):
     global current_M_xaxis
@@ -393,7 +423,7 @@ def repl():
             try:
                 parts = cmd.split()
                 axis = parts[1]
-                mm = int(parts[2])
+                mm = float(parts[2])
                 forward = True
                 speed_fast = False
                 if len(parts) > 3:
@@ -450,3 +480,9 @@ if __name__ == "__main__":
     # Start REPL after running the script
     repl()
     disable_motor()
+
+
+
+# attempt at making a lookup table for interpolation
+# steps = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000]
+# mm_moved = [1.77, 1.78, 1.75, 1.6, 1.58, 1.52, 1.43, 1.37, 1.33, 1.38, 1.17, 1.22, 1.16, 1.18, 1.09, 1.07, 1.07]
