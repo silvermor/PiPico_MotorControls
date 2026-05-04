@@ -1,3 +1,10 @@
+"""
+main.py
+
+SiPM Motor Controls for the reference detector
+
+"""
+
 import time
 from machine import Pin
 import math
@@ -24,7 +31,7 @@ MM_PER_REV_X = 1   # lead screw pitch in mm/rev
 SUBDIVISION = 8   # microstepping setting
 STEP_ANGLE = 1.8 / SUBDIVISION  # degrees per step
 MM_PER_STEP = MM_PER_REV_Y / (STEP_ANGLE/360)  # mm per microstep
-STEPS_PER_REV = int(360 / STEP_ANGLE)  # steps per revolution
+STEPS_PER_REV = int(360 / STEP_ANGLE)  # steps per revolution, should be 1600
 Y_HOME = 3.2        # mm, measured at M=0 using a feeler gauge
 L = math.sqrt(10388)   #101.9215384     # mm, length of scissor arms
 
@@ -39,11 +46,13 @@ current_M_xaxis = 0.000000
 def enable_motor():
     en_pin_y.value(0)
     en_pin_x.value(0)
-    
+
+
 def disable_motor():
     en_pin_y.value(1)
     en_pin_x.value(1)
-    
+
+
 def safe_step_y(direction, speed_fast=False):
     """
     Perform one step in the given direction.
@@ -67,6 +76,7 @@ def safe_step_y(direction, speed_fast=False):
     time.sleep_us(delay_us)
     return True
 
+
 def safe_step_x(direction, speed_fast=False):
     """
     Perform one step in the given direction.
@@ -89,6 +99,7 @@ def safe_step_x(direction, speed_fast=False):
     pul_pin_x.value(0)
     time.sleep_us(delay_us)
     return True
+
 
 def move_until_limit_y(direction, limit_pin, speed_fast=True, backoff_slow=True):
     """
@@ -144,8 +155,6 @@ def move_until_limit_y(direction, limit_pin, speed_fast=True, backoff_slow=True)
     # Return net steps moved
     net_steps = forward_steps - backoff_steps
     return net_steps
-
-
 
 
 def move_until_limit_x(direction, limit_pin, speed_fast=True, backoff_slow=True):
@@ -204,8 +213,6 @@ def move_until_limit_x(direction, limit_pin, speed_fast=True, backoff_slow=True)
     return net_steps
 
 
-
-
 def home(axis):
     global current_M_yaxis
     print("Homing to MIN " + axis + " limit...")
@@ -217,18 +224,6 @@ def home(axis):
         current_M_xaxis = 0.0
     print(f"Moved a total of {net_steps} steps to Home position")
     print("Home set: M=0.00 mm")
-
-
-#def calibrate():
- #   global current_M_yaxis, M_max
-  #  home()
-   # print("Traversing to MAX limit...")
- #   net_steps = move_until_limit_y(0, max_limit_y, speed_fast=True)
- #   M_max = (net_steps / STEPS_PER_REV) * MM_PER_REV
- #   current_M_yaxis = M_max
- #   print(f"Calibration complete: M_max = {M_max:.2f} mm")
- #   print("Returning home...")
- #   home()
 
 
 def move_steps_y(num_steps=1, speed_fast=False, forward=True):
@@ -329,6 +324,7 @@ def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
     print(f"Moved ΔM = {actual_delta_M:.4f} mm → New Z = {current_Z:.3f} mm")
     print(f"Steps moved: {moved_steps}")
 
+
 def move_distance_mm_x(dist_mm, speed_fast=True, forward=True):
     global current_M_xaxis
     if M_max_x is not None:
@@ -353,17 +349,20 @@ def move_distance_mm_x(dist_mm, speed_fast=True, forward=True):
     current_M_xaxis += distance_in_x if forward else -distance_in_x
     print(f"Moved in x {'FWD' if forward else 'REV'} {dist_mm:.2f} mm, M x axis={current_M_xaxis:.2f}")
 
+
 def z_from_m(M):
     """Convert screw travel Z to platform height M using scissor geometry."""
     X =  98 - M - Y_HOME #98.3725 97.4099999
     Z = math.sqrt(L*L - (X*X))
     return Z
 
+
 def m_from_z(Z):
     """Convert platform height M to screw travel Z using scissor geometry."""
     X = math.sqrt(L*L - (Z*Z))
     M = 98 - X - Y_HOME #98.3725 97.4099999
     return M
+
 
 def automatedGridMovement():
     for i in range(8):
@@ -372,7 +371,6 @@ def automatedGridMovement():
             move_distance_mm_x(3, True, True)
             #ADD WAIT STATEMENT HERE FOR COLLECTING DATA
         move_distance_mm_y(3, True, True) #move upwards once current row done
-        
 
 
 def repl():
@@ -474,15 +472,8 @@ def repl():
         else:
             print("Unknown command. Type 'help'.")
 
-
 if __name__ == "__main__":
     # Simple REPL for manual command entry
     # Start REPL after running the script
     repl()
     disable_motor()
-
-
-
-# attempt at making a lookup table for interpolation
-# steps = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000]
-# mm_moved = [1.77, 1.78, 1.75, 1.6, 1.58, 1.52, 1.43, 1.37, 1.33, 1.38, 1.17, 1.22, 1.16, 1.18, 1.09, 1.07, 1.07]
