@@ -39,8 +39,8 @@ L = math.sqrt(10388)   #101.9215384     # mm, length of scissor arms
 # Position tracking
 current_M_yaxis = 0.000000
 current_Z = 0.000000
-M_max_y = 41.53
-M_max_x = 65.64
+M_max_y = None  # Set by calibrate(); was hardcoded 41.53
+M_max_x = None  # Set by calibrate(); was hardcoded 65.64
 current_M_xaxis = 0.000000
 
 def enable_motor():
@@ -214,16 +214,66 @@ def move_until_limit_x(direction, limit_pin, speed_fast=True, backoff_slow=True)
 
 
 def home(axis):
-    global current_M_yaxis
+    global current_M_yaxis, current_M_xaxis, current_Z
     print("Homing to MIN " + axis + " limit...")
-    if (axis == "y"):
+    if axis == "y":
         net_steps = move_until_limit_y(1, min_limit_y, speed_fast=True)
         current_M_yaxis = 0.0
-    elif (axis == "x"):
+        current_Z = z_from_m(0.0)
+    elif axis == "x":
         net_steps = move_until_limit_x(1, min_limit_x, speed_fast=True)
         current_M_xaxis = 0.0
     print(f"Moved a total of {net_steps} steps to Home position")
     print("Home set: M=0.00 mm")
+
+
+def calibrate(axis):
+    global current_M_yaxis, current_M_xaxis, M_max_y, M_max_x, current_Z
+
+    if axis == "y":
+        print("=== Calibrating Y axis ===")
+
+        print("Step 1: Homing to MIN limit...")
+        home("y")
+        print(f"  Z_min = {z_from_m(0.0):.3f} mm")
+
+        print("Step 2: Moving to MAX limit...")
+        net_steps_travel = move_until_limit_y(0, max_limit_y, speed_fast=True)
+        M_max_y = (net_steps_travel / STEPS_PER_REV) * MM_PER_REV_Y
+        current_M_yaxis = M_max_y
+        current_Z = z_from_m(M_max_y)
+        print(f"  Z_max = {current_Z:.3f} mm  (M_max_y = {M_max_y:.4f} mm, {net_steps_travel} steps)")
+
+        print("Step 3: Returning to MIN position by step count...")
+        move_steps_y(net_steps_travel, speed_fast=True, forward=False)
+        # current_M_yaxis = 0.0 # shouldnt be necessary. M here should be calculated back to 0 here
+        current_Z = z_from_m(current_M_yaxis) 
+
+        print(f"\nY calibration complete:")
+        print(f"  Z range: {z_from_m(0.0):.3f} mm  →  {z_from_m(M_max_y):.3f} mm")
+        print(f"  M range: 0.0000 mm  →  {M_max_y:.4f} mm  ({net_steps_travel} steps)")
+
+    elif axis == "x":
+        print("=== Calibrating X axis ===")
+
+        print("Step 1: Homing to MIN limit...")
+        home("x")
+
+        print("Step 2: Moving to MAX limit...")
+        net_steps_travel = move_until_limit_x(0, max_limit_x, speed_fast=True)
+        M_max_x = (net_steps_travel / STEPS_PER_REV) * MM_PER_REV_X
+        current_M_xaxis = M_max_x
+        print(f"  M_max_x = {M_max_x:.4f} mm  ({net_steps_travel} steps)")
+
+        print("Step 3: Returning to MIN position by step count...")
+        move_steps_x(net_steps_travel, speed_fast=True, forward=False)
+        # current_M_xaxis = 0.0 # shouldnt be necessary. M here should be calculated back to 0 here
+
+        print(f"\nX calibration complete:")
+        print(f"  M range: 0.0000 mm  →  {M_max_x:.4f} mm  ({net_steps_travel} steps)")
+
+    else:
+        print(f"Unknown axis '{axis}'. Use 'x' or 'y'.")
 
 
 def move_steps_y(num_steps=1, speed_fast=False, forward=True):
@@ -243,7 +293,7 @@ def move_steps_y(num_steps=1, speed_fast=False, forward=True):
     time.sleep(0.01)  # brief pause
     dist_mm = (actual_steps_moved / STEPS_PER_REV) * MM_PER_REV_Y
     current_M_yaxis += dist_mm if forward else -dist_mm
-    print(f"Moved {'FWD' if forward else 'REV'} {num_steps} steps ({dist_mm:.2f} mm), M y axis={current_M_yaxis:.2f}")
+    print(f"Moved {'FWD' if forward else 'REV'} {num_steps} steps ({dist_mm:.4f} mm), M y axis={current_M_yaxis:.4f}")
 
 
 def move_steps_x(num_steps=1, speed_fast=False, forward=True):
@@ -263,14 +313,15 @@ def move_steps_x(num_steps=1, speed_fast=False, forward=True):
     time.sleep(0.01)  # brief pause
     dist_mm = (actual_steps_moved / STEPS_PER_REV) * MM_PER_REV_X
     current_M_xaxis += dist_mm if forward else -dist_mm
-    print(f"Moved {'FWD' if forward else 'REV'} {num_steps} steps ({dist_mm:.2f} mm), M x axis={current_M_xaxis:.2f}")
+    print(f"Moved {'FWD' if forward else 'REV'} {num_steps} steps ({dist_mm:.4f} mm), M x axis={current_M_xaxis:.4f}")
 
 
 def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
     global current_M_yaxis, current_Z
     
-    # Detetmine current Z from current M
+    # Determine current Z from current M
     current_Z = z_from_m(current_M_yaxis)
+    prev_Z = current_Z
     # Compute target Z
     if forward:
         target_Z = current_Z + dist_mm
@@ -278,12 +329,16 @@ def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
         target_Z = current_Z - dist_mm
     # Clamp physical limits
     Z_min = z_from_m(0)
-    Z_max = z_from_m(M_max_y)
-
     if target_Z < Z_min:
+        print(f"WARNING: requested ΔZ would go below Z_min ({Z_min:.3f} mm). Clamping.")
         target_Z = Z_min
-    if target_Z > Z_max:
-        target_Z = Z_max
+    if M_max_y is None:
+        print("WARNING: M_max_y not calibrated — upper limit not enforced. Run 'calibrate y' first.")
+    else:
+        Z_max = z_from_m(M_max_y)
+        if target_Z > Z_max:
+            print(f"WARNING: requested ΔZ would exceed Z_max ({Z_max:.3f} mm). Clamping.")
+            target_Z = Z_max
     
     # Convert target Z -> target M
     target_M = m_from_z(target_Z)
@@ -321,6 +376,7 @@ def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
 
     # Report
     print(f"Requested ΔZ = {dist_mm:.3f} mm {'FWD' if forward else 'REV'}")
+    print(f"Actual ΔZ    = {current_Z - prev_Z:.3f} mm")
     print(f"Moved ΔM = {actual_delta_M:.4f} mm → New Z = {current_Z:.3f} mm")
     print(f"Steps moved: {moved_steps}")
 
@@ -382,10 +438,11 @@ def repl():
             break
         elif cmd == "help":
             print("Commands:")
-            print("  home")
-            print("  calibrate")
-            print("  move <steps> [rev] [fast]")
-            print("  mul <fwd|rev> [fast|slow]   # move until limit")
+            print("  home <axis>")
+            print("  calibrate <axis>            # travel MIN→MAX→MIN, sets M_max")
+            print("  move <axis> <steps> [rev] [fast]")
+            print("  movemm <axis> <mm> [rev|fwd] [fast]")
+            print("  mul <axis> <fwd|rev> [fast|slow]   # move until limit")
             print("  z")
             print("  exit")
         elif cmd.startswith("home"):
@@ -395,8 +452,13 @@ def repl():
                 home(axis)
             except Exception:
                 print("Usage: home <axis>")
-        #elif cmd == "calibrate":
-         #   calibrate()
+        elif cmd.startswith("calibrate"):
+            try:
+                parts = cmd.split()
+                axis = parts[1]
+                calibrate(axis)
+            except Exception:
+                print("Usage: calibrate <axis>")
         elif cmd.startswith("move "):
             try:
                 parts = cmd.split()

@@ -36,3 +36,77 @@ Useful control commands:
 
 For further help on a specific object, type help(obj)
 For a list of available modules, type help('modules')
+
+2026 May 5: Main.py
+>>> home y
+home y
+Homing to MIN y limit...
+Moved a total of 14824 steps to Home position
+Home set: M=0.00 mm
+>> 
+>>> movemm y 2 fwd fast
+movemm y 2 fwd fast
+Requested ΔZ = 2.000 mm FWD
+Moved ΔM = 0.8141 mm → New Z = 39.429 mm
+Steps moved: 1042
+>> 
+>>> movemm y 10 fwd fast
+movemm y 10 fwd fast
+Requested ΔZ = 10.000 mm FWD
+Moved ΔM = 4.8523 mm → New Z = 49.429 mm
+Steps moved: 6211
+>> 
+>>> movemm y 10 fwd fast
+movemm y 10 fwd fast
+Requested ΔZ = 10.000 mm FWD
+Moved ΔM = 6.3313 mm → New Z = 59.429 mm
+Steps moved: 8104
+>> 
+>>> movemm y 10 fwd fast
+movemm y 10 fwd fast
+Requested ΔZ = 10.000 mm FWD
+Moved ΔM = 8.1859 mm → New Z = 69.429 mm
+Steps moved: 10478
+>> 
+>>> movemm y 10 fwd fast
+movemm y 10 fwd fast
+Requested ΔZ = 10.000 mm FWD
+Moved ΔM = 10.7492 mm → New Z = 79.429 mm
+Steps moved: 13759
+>> 
+>>> movemm y 10 fwd fast
+movemm y 10 fwd fast
+Requested ΔZ = 10.000 mm FWD
+Moved ΔM = 10.5969 mm → New Z = 86.892 mm
+Steps moved: 13564
+>> 
+>>> 
+>>> movemm y 10 rev fast
+movemm y 10 rev fast
+Requested ΔZ = 10.000 mm REV
+Moved ΔM = -13.6297 mm → New Z = 76.892 mm
+Steps moved: 17446
+>> 
+>>> movemm y 10 rev fast
+movemm y 10 rev fast
+Requested ΔZ = 10.000 mm REV
+Moved ΔM = -9.9992 mm → New Z = 66.892 mm
+Steps moved: 12799
+>> 
+>>> movemm y 10 rev fast
+movemm y 10 rev fast
+Requested ΔZ = 10.000 mm REV
+Moved ΔM = -7.6664 mm → New Z = 56.892 mm
+Steps moved: 9813
+>> 
+>>> movemm y 10 rev fast
+movemm y 10 rev fast
+Requested ΔZ = 10.000 mm REV
+Moved ΔM = -5.9281 mm → New Z = 46.892 mm
+Steps moved: 7588
+>> 
+>>> movemm y 10 rev fast
+movemm y 10 rev fast
+Requested ΔZ = 10.000 mm REV
+Moved ΔM = -4.3063 mm → New Z = 37.429 mm
+Steps moved: 5512
