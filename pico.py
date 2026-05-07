@@ -1,3 +1,4 @@
+from pathlib import Path
 import serial
 import time
 
@@ -6,7 +7,8 @@ class Pico:
         self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
         time.sleep(0.5)
         self._flush() # clear any boot messages
-        self.exec("import Main as m") # load main once on connect
+        self.upload("Main.py") # push the latest version of Main.py
+        self.exec("import Main as m") # then load it
 
     def _flush(self):
         self.ser.read_all()
@@ -15,7 +17,6 @@ class Pico:
         """
         Send a command to the Pico REPL and return its output
         timeout = hard limit in seconds
-        idle-timeout = how long to wait with no new output before giving up
         """
         self._flush()
         self.ser.write((cmd + "\r\n").encode())
@@ -40,5 +41,60 @@ class Pico:
             print(f"\nCommand took {time.time() - start_time:.2f} seconds.")
         return output
     
+    def upload(self, local_path, remote_path=None, chunk_size=1024):
+        """
+        Upload a file to the Pico using raw REPL mode (Ctrl+A), which is
+        much faster than exec() — no prompt-polling overhead, and larger chunks.
+
+        local_path  : path to the file on the host
+        remote_path : destination filename on the Pico (default: basename of local_path)
+        chunk_size  : bytes per write call; 1024 is a safe fast default
+        """
+        if remote_path is None:
+            remote_path = Path(local_path).name
+
+        with open(local_path, "rb") as f:
+            data = f.read()
+        total = len(data)
+
+        # --- enter raw REPL (Ctrl+A) ---
+        self.ser.write(b"\x01")
+        self.ser.flush()
+        deadline = time.time() + 5
+        buf = b""
+        while time.time() < deadline:
+            buf += self.ser.read_all()
+            if buf.endswith(b">"):
+                break
+            time.sleep(0.05)
+
+        def raw_exec(cmd):
+            """Send one command in raw REPL mode and wait for \x04\x04 completion."""
+            self.ser.write(cmd.encode() + b"\x04")
+            self.ser.flush()
+            result = b""
+            n_delimiters = 0
+            while n_delimiters < 2:
+                c = self.ser.read(1)
+                if c == b"\x04":
+                    n_delimiters += 1
+                result += c
+            return result
+
+        raw_exec(f"_f = open('{remote_path}', 'wb')")
+        for offset in range(0, total, chunk_size):
+            chunk = data[offset : offset + chunk_size]
+            raw_exec(f"_f.write({chunk!r})")
+            pct = min(offset + chunk_size, total) / total * 100
+            print(f"\rUploading {remote_path}: {pct:.0f}%", end="", flush=True)
+        raw_exec("_f.close(); del _f")
+
+        # --- exit raw REPL (Ctrl+B) ---
+        self.ser.write(b"\x02")
+        time.sleep(0.2)
+        self.ser.read_all()
+
+        print(f"\r✓ Uploaded {local_path} → {remote_path} ({total} bytes)")
+
     def close(self):
         self.ser.close()
