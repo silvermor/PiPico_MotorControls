@@ -1,0 +1,7 @@
+TR_*.txt
+wave_*.txt
+wavedump_foobar.log
+X742Table_*.txt
+__pycache__/
+gui/__pycache__/
+*.hdf5
