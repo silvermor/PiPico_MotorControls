@@ -13,7 +13,7 @@ class Pico:
     def _flush(self):
         self.ser.read_all()
     
-    def exec(self, cmd, timeout=600, debug=False): # 10 minutes should be enough time for everything
+    def exec(self, cmd, timeout=1800, debug=False): # 30 minutes should be enough time for everything
         """
         Send a command to the Pico REPL and return its output
         timeout = hard limit in seconds

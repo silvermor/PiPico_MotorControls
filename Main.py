@@ -100,7 +100,7 @@ def safe_step_x(direction, speed_fast=False):
     return True
 
 
-def move_until_limit_y(direction, limit_pin, speed_fast=True, backoff_slow=True):
+def move_until_limit_y(direction, limit_pin, speed_fast=False, backoff_slow=True):
     """
     Move in given direction until limit switch triggers,
     then back off slowly until switch releases.
@@ -156,7 +156,7 @@ def move_until_limit_y(direction, limit_pin, speed_fast=True, backoff_slow=True)
     return net_steps
 
 
-def move_until_limit_x(direction, limit_pin, speed_fast=True, backoff_slow=True):
+def move_until_limit_x(direction, limit_pin, speed_fast=False, backoff_slow=True):
     """
     Move in given direction until limit switch triggers,
     then back off slowly until switch releases.
@@ -216,11 +216,11 @@ def home(axis):
     global current_M_yaxis, current_M_xaxis, current_Z
     print("Homing to MIN " + axis + " limit...")
     if axis == "y":
-        net_steps = move_until_limit_y(1, min_limit_y, speed_fast=True)
+        net_steps = move_until_limit_y(1, min_limit_y, speed_fast=False)
         current_M_yaxis = 0.0
         current_Z = z_from_m(0.0)
     elif axis == "x":
-        net_steps = move_until_limit_x(1, min_limit_x, speed_fast=True)
+        net_steps = move_until_limit_x(1, min_limit_x, speed_fast=False)
         current_M_xaxis = 0.0
     print(f"Moved a total of {net_steps} steps to Home position")
     print("Home set: M=0.00 mm")
@@ -237,7 +237,7 @@ def calibrate(axis):
         print(f"  Z_min = {z_from_m(0.0):.3f} mm")
 
         print("Step 2: Moving to MAX limit...")
-        net_steps_travel = move_until_limit_y(0, max_limit_y, speed_fast=True)
+        net_steps_travel = move_until_limit_y(0, max_limit_y, speed_fast=False)
         M_max_y = (net_steps_travel / STEPS_PER_REV) * MM_PER_REV_Y
         current_M_yaxis = M_max_y
         current_Z = z_from_m(M_max_y)
@@ -259,13 +259,13 @@ def calibrate(axis):
         home("x")
 
         print("Step 2: Moving to MAX limit...")
-        net_steps_travel = move_until_limit_x(0, max_limit_x, speed_fast=True)
+        net_steps_travel = move_until_limit_x(0, max_limit_x, speed_fast=False)
         M_max_x = (net_steps_travel / STEPS_PER_REV) * MM_PER_REV_X
         current_M_xaxis = M_max_x
         print(f"  M_max_x = {M_max_x:.4f} mm  ({net_steps_travel} steps)")
 
         print("Step 3: Returning to MIN position by step count...")
-        move_steps_x(net_steps_travel, speed_fast=True, forward=False)
+        move_steps_x(net_steps_travel, speed_fast=False, forward=False)
         # current_M_xaxis = 0.0 # shouldnt be necessary. M here should be calculated back to 0 here
 
         print(f"\nX calibration complete:")
@@ -315,7 +315,7 @@ def move_steps_x(num_steps=1, speed_fast=False, forward=True):
     print(f"Moved {'FWD' if forward else 'REV'} {num_steps} steps ({dist_mm:.4f} mm), M x axis={current_M_xaxis:.4f}")
 
 
-def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
+def move_distance_mm_y(dist_mm, speed_fast=False, forward=True):
     global current_M_yaxis, current_Z
     
     # Determine current Z from current M
@@ -380,7 +380,7 @@ def move_distance_mm_y(dist_mm, speed_fast=True, forward=True):
     print(f"Steps moved: {moved_steps}")
 
 
-def move_distance_mm_x(dist_mm, speed_fast=True, forward=True):
+def move_distance_mm_x(dist_mm, speed_fast=False, forward=True):
     global current_M_xaxis
     if M_max_x is not None:
         if forward:
@@ -424,9 +424,11 @@ def test_axis_backlash(axis = "y", direction = 1, speed_fast = False):
     if axis == "y":
         safe_step = safe_step_y
         limit_pin = min_limit_y if direction == 1 else max_limit_y
+        mm_per_rev = MM_PER_REV_Y
     elif axis == "x":
         safe_step = safe_step_x
         limit_pin = min_limit_x if direction == 1 else max_limit_x
+        mm_per_rev = MM_PER_REV_X
     else:
         print(f"Unknown axis '{axis}'. Use 'x' or 'y'.")
         return
@@ -449,7 +451,8 @@ def test_axis_backlash(axis = "y", direction = 1, speed_fast = False):
                 actual_steps = p
                 break
             actual_steps = p + 1
-        print(f"Approach {loop + 1}, steps to limit: {actual_steps}")
+        approach_mm = (actual_steps / STEPS_PER_REV) * mm_per_rev
+        print(f"Approach {loop + 1}, steps to limit: {actual_steps} ({approach_mm:.4f} mm)")
         loops.append(actual_steps)
         time.sleep(1)
         # back off, tracking when the limit switch releases
@@ -462,16 +465,22 @@ def test_axis_backlash(axis = "y", direction = 1, speed_fast = False):
             actual_steps = p + 1
             if release_steps == 0 and limit_pin.value() == 1:
                 release_steps = actual_steps
-        print(f"Backoff {loop + 1}, steps backed off: {actual_steps}, limit released at step: {release_steps}")
+        backoff_mm = (actual_steps / STEPS_PER_REV) * mm_per_rev
+        release_mm = (release_steps / STEPS_PER_REV) * mm_per_rev
+        print(f"Backoff {loop + 1}, steps backed off: {actual_steps} ({backoff_mm:.4f} mm), limit released at step: {release_steps} ({release_mm:.4f} mm)")
         release_loops.append(release_steps)
     average_steps = sum(loops) / len(loops)
     median_steps = sorted(loops)[len(loops) // 2]
-    print(f"Average steps to hit limit: {average_steps:.2f}")
-    print(f"Median steps to hit limit: {median_steps}")
+    std_steps = math.sqrt(sum((s - average_steps) ** 2 for s in loops) / len(loops))
+    print(f"Average steps to hit limit: {average_steps:.2f} ({(average_steps / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
+    print(f"Median steps to hit limit: {median_steps} ({(median_steps / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
+    print(f"Std dev steps to hit limit: {std_steps:.2f} ({(std_steps / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
     average_release = sum(release_loops) / len(release_loops)
     median_release = sorted(release_loops)[len(release_loops) // 2]
-    print(f"Average steps to release limit: {average_release:.2f}")
-    print(f"Median steps to release limit: {median_release}")
+    std_release = math.sqrt(sum((s - average_release) ** 2 for s in release_loops) / len(release_loops))
+    print(f"Average steps to release limit: {average_release:.2f} ({(average_release / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
+    print(f"Median steps to release limit: {median_release} ({(median_release / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
+    print(f"Std dev steps to release limit: {std_release:.2f} ({(std_release / STEPS_PER_REV) * mm_per_rev:.4f} mm)")
     
 
 def repl():
