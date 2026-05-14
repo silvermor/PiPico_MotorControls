@@ -8,12 +8,12 @@ class Pico:
         time.sleep(0.5)
         self._flush() # clear any boot messages
         self.upload("Main.py") # push the latest version of Main.py
-        self.exec("import Main as m") # then load it
+        self.exec("import sys; sys.modules.pop('Main', None); import Main as m") # force fresh load
 
     def _flush(self):
         self.ser.read_all()
     
-    def exec(self, cmd, timeout=300, debug=False): # 5 minutes should be enough time for everything
+    def exec(self, cmd, timeout=600, debug=False): # 10 minutes should be enough time for everything
         """
         Send a command to the Pico REPL and return its output
         timeout = hard limit in seconds
@@ -80,6 +80,10 @@ class Pico:
                     n_delimiters += 1
                 result += c
             return result
+
+        # Remove stale .mpy so MicroPython doesn't load it instead of the fresh .py
+        stem = remote_path.rsplit(".", 1)[0]
+        raw_exec(f"try:\n import os\n os.remove('{stem}.mpy')\nexcept OSError:\n pass")
 
         raw_exec(f"_f = open('{remote_path}', 'wb')")
         for offset in range(0, total, chunk_size):

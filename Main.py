@@ -35,7 +35,6 @@ STEPS_PER_REV = int(360 / STEP_ANGLE)  # steps per revolution, should be 1600
 Y_HOME = 3.2        # mm, measured at M=0 using a feeler gauge
 L = math.sqrt(10388)   #101.9215384     # mm, length of scissor arms
 
-
 # Position tracking
 current_M_yaxis = 0.000000
 current_Z = 0.000000
@@ -420,14 +419,60 @@ def m_from_z(Z):
     return M
 
 
-def automatedGridMovement():
-    for i in range(8):
-        home("x") 
-        for j in range(8):
-            move_distance_mm_x(3, True, True)
-            #ADD WAIT STATEMENT HERE FOR COLLECTING DATA
-        move_distance_mm_y(3, True, True) #move upwards once current row done
+def test_axis_backlash(axis = "y", direction = 1, speed_fast = False):
+    opposite_dir = 1 if direction == 0 else 0
+    if axis == "y":
+        safe_step = safe_step_y
+        limit_pin = min_limit_y if direction == 1 else max_limit_y
+    elif axis == "x":
+        safe_step = safe_step_x
+        limit_pin = min_limit_x if direction == 1 else max_limit_x
+    else:
+        print(f"Unknown axis '{axis}'. Use 'x' or 'y'.")
+        return
 
+    # move until limit
+    while limit_pin.value() == 1:
+        safe_step(direction, speed_fast)
+    # backoff from limit
+    for p in range(2400):
+        if not safe_step(opposite_dir, speed_fast):
+            break
+    # now we check the consistency of the limit switch
+    loops = []
+    release_loops = []
+    for loop in range(20):
+        # approach the limit switch
+        actual_steps = 0
+        for p in range(3200):
+            if not safe_step(direction, speed_fast):
+                actual_steps = p
+                break
+            actual_steps = p + 1
+        print(f"Approach {loop + 1}, steps to limit: {actual_steps}")
+        loops.append(actual_steps)
+        time.sleep(1)
+        # back off, tracking when the limit switch releases
+        actual_steps = 0
+        release_steps = 0
+        for p in range(2400):
+            if not safe_step(opposite_dir, speed_fast):
+                actual_steps = p
+                break
+            actual_steps = p + 1
+            if release_steps == 0 and limit_pin.value() == 1:
+                release_steps = actual_steps
+        print(f"Backoff {loop + 1}, steps backed off: {actual_steps}, limit released at step: {release_steps}")
+        release_loops.append(release_steps)
+    average_steps = sum(loops) / len(loops)
+    median_steps = sorted(loops)[len(loops) // 2]
+    print(f"Average steps to hit limit: {average_steps:.2f}")
+    print(f"Median steps to hit limit: {median_steps}")
+    average_release = sum(release_loops) / len(release_loops)
+    median_release = sorted(release_loops)[len(release_loops) // 2]
+    print(f"Average steps to release limit: {average_release:.2f}")
+    print(f"Median steps to release limit: {median_release}")
+    
 
 def repl():
     print("Manual command mode. Type 'help' for options.")
@@ -443,6 +488,7 @@ def repl():
             print("  move <axis> <steps> [rev] [fast]")
             print("  movemm <axis> <mm> [rev|fwd] [fast]")
             print("  mul <axis> <fwd|rev> [fast|slow]   # move until limit")
+            print("  backlash <axis> [direction] [fast|slow]  # test limit switch repeatability")
             print("  z")
             print("  exit")
         elif cmd.startswith("home"):
@@ -529,6 +575,15 @@ def repl():
                 print(f"Moved until limit: {net_steps} net steps ({dist_mm:.2f} mm), M={current_M_xaxis:.2f}")
             except Exception:
                 print("Usage: mul <axis> <fwd|rev> [fast|slow]")
+        elif cmd.startswith("backlash"):
+            try:
+                parts = cmd.split()
+                axis = parts[1] if len(parts) > 1 else "y"
+                direction = int(parts[2]) if len(parts) > 2 else 1
+                speed_fast = len(parts) > 3 and parts[3] == "fast"
+                test_axis_backlash(axis, direction, speed_fast)
+            except Exception:
+                print("Usage: backlash <axis> [direction] [fast|slow]")
         elif cmd == "z":
             print(f"Current Z height: {z_from_m(current_M_yaxis):.6f} mm")
         else:
