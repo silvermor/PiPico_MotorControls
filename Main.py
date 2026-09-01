@@ -89,7 +89,7 @@ def safe_step_x(direction, speed_fast=False):
         return False
     
     # Set direction
-    dir_pin_x.value(direction)
+    dir_pin_x.value(1 - direction) # direction of x-axis is inverted due to wiring!
 
     # Pulse
     delay_us = FAST_STEP_DELAY if speed_fast else SLOW_STEP_DELAY
@@ -265,7 +265,7 @@ def calibrate(axis):
         print(f"  M_max_x = {M_max_x:.4f} mm  ({net_steps_travel} steps)")
 
         print("Step 3: Returning to MIN position by step count...")
-        move_steps_x(net_steps_travel, speed_fast=False, forward=False)
+        move_steps_x(net_steps_travel, speed_fast=True, forward=False)
         # current_M_xaxis = 0.0 # shouldnt be necessary. M here should be calculated back to 0 here
 
         print(f"\nX calibration complete:")
