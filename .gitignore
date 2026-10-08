@@ -5,3 +5,5 @@ X742Table_*.txt
 __pycache__/
 gui/__pycache__/
 *.hdf5
+*.csv
+*.html
